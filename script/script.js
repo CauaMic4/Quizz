@@ -82,50 +82,96 @@ function init() {
 
 // criar uma pergunta
 function createQuestion(i) {
-    // limpar a questao anterior
-    const oldButtons = answersBox.querySelectorAll("button");
 
-    oldButtons.forEach(function (btn) {
-        btn.remove();
+  // Limpa questão anterior
+  const oldButtons = answersBox.querySelectorAll("button");
+
+  oldButtons.forEach(function(btn) {
+    btn.remove();
+  });
+
+  // Altera texto da pergunta
+  const questionText = question.querySelector("#question-text");
+  const questionNumber = question.querySelector("#question-number");
+
+  questionText.textContent = questions[i].question;
+  questionNumber.textContent = i + 1;
+
+  // Insere alternativas
+  questions[i].answers.forEach(function(answer, i) {
+    
+    // Altera texto do template
+    const answerTemplate = document.querySelector(".answer-template").cloneNode(true);
+
+    const letterBtn = answerTemplate.querySelector(".btn-letter");
+    const answerText = answerTemplate.querySelector(".question-answer");
+
+    letterBtn.textContent = letters[i];
+    answerText.textContent = answer['answer'];
+
+    answerTemplate.setAttribute("correct-answer", answer["correct"]);
+
+    // remove classe de hide e template do template
+    answerTemplate.classList.remove("hide");
+    answerTemplate.classList.remove("answer-template");
+
+    // Insere template na tela
+    answersBox.appendChild(answerTemplate);
+
+  });
+
+  // Cria evento em todos os botões
+  const buttons = answersBox.querySelectorAll("button");
+
+  buttons.forEach(function(button) {
+    button.addEventListener("click", function() {
+      checkAnswer(this, buttons);
     });
+  });
 
-    // alterar o texto da pergunta
-    const questionText = question.querySelector("#question-text");
-    const questionNumber = question.querySelector("#question-number");
+  // Incrementa o número atual de questões
+  actualQuestion++;
 
-    questionText.textContent = questions[i].question;
-    questionNumber.textContent = i + 1;
+} 
 
-    // Insere as alternativas
-    questions[i].answers.forEach(function (answer, i) {
-        // Altera o template do botao do quizz
-        const answerTemplate = document.querySelector(".answer-template").cloneNode(true);
-        const letterBtn = answerTemplate.querySelector(".btn-letter");
-        const answerText = answerTemplate.querySelector(".question-answer");
+function checkAnswer(btn, buttons) {
+  
+    // Exibir respostas erradas e a certa
+    buttons.forEach(function (button) {
 
-        letterBtn.textContent = letters[i];
-        answerText.textContent = answer["answer"];
-
-        answerTemplate.setAttribute("correct-answer", answer["correct"]);
-
-        // Remover hide e template class
-        answerTemplate.classList.remove("hide");
-        answerTemplate.classList.remove("answer-template");
-
-        // Inserir a alternativa na tela
-        answersBox.appendChild(answerTemplate);
-
-        // Inserir evento de click no botao
-        answerTemplate.addEventListener("click", function () {
-            console.log(this);
-        });
-    });    
-
-    // Incrementar o numero da questão
-    actualQuestion++;
+        if (button.getAttribute("correct-answer") === "true") {
+            button.classList.add("correct-answer");
+        
+            // checa se o usuário acertou
+            if (btn === button) {
+            
+                // incrementa os pontos
+                points++;
+            }
+        } else {
+            button.classList.add("wrong-answer");
+        }
+      
+    });
+    // Exibir proxima pergunta
+    nextQuestion();
 }
 
+// Exibir proxima pergunta
+function nextQuestion() {
+    //timer para usuario ver as respostas
+    setTimeout(function () {
+        // verifica se ainda ha perguntas
+        if (actualQuestion >= question.length) {
+            // imprime msg de sucesso
 
+        }
+
+        createQuestion(actualQuestion);
+        
+    }, 1500);
+}
+    
 
 // inicialização do quizz
 init();
